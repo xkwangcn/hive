@@ -52,3 +52,9 @@ VOLUME /user/hive/warehouse /var/lib/hive
 
 USER 1002
 
+LABEL io.k8s.display-name="OpenShift Hive" \
+      io.k8s.description="This is an image used by operator-metering to to install and run Apache Hive." \
+      io.openshift.tags="openshift" \
+      maintainer="Chance Zibolski <czibolsk@redhat.com>"
+
+
