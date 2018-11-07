@@ -1,0 +1,73 @@
+FROM centos:7 as build
+
+RUN yum -y update && yum clean all
+
+RUN yum -y install curl \
+    && yum clean all \
+    && rm -rf /var/cache/yum
+
+RUN mkdir /build
+COPY . /build
+
+WORKDIR /build
+
+ENV RH_HIVE_PATCH_VERSION 00001
+ENV HIVE_VERSION 2.3.3
+
+ENV HIVE_RELEASE_URL http://download.eng.bos.redhat.com/brewroot/packages/org.apache.hive-hive/${HIVE_VERSION}.redhat_${RH_HIVE_PATCH_VERSION}/1/maven/org/apache/hive/hive-packaging/${HIVE_VERSION}.redhat-${RH_HIVE_PATCH_VERSION}/hive-packaging-${HIVE_VERSION}.redhat-${RH_HIVE_PATCH_VERSION}-bin.tar.gz
+ENV HIVE_OUT /build/packaging/target/apache-hive-$HIVE_VERSION-bin/apache-hive-$HIVE_VERSION-bin
+
+RUN curl -fSLs \
+    $HIVE_RELEASE_URL \
+    -o /tmp/hive-bin.tar.gz
+
+RUN mkdir -p $(dirname $HIVE_OUT) && \
+    tar -xvf /tmp/hive-bin.tar.gz -C /tmp \
+    && mv /tmp/apache-hive-${HIVE_VERSION}.redhat-${RH_HIVE_PATCH_VERSION}-bin/ \
+    $HIVE_OUT
+
+FROM quay.io/coreos/hadoop:metering-3.1.1
+
+ENV HIVE_VERSION=2.3.3
+ENV HIVE_HOME=/opt/hive-$HIVE_VERSION
+ENV PATH=$HIVE_HOME/bin:$PATH
+
+RUN mkdir -p /opt
+WORKDIR /opt
+
+USER root
+
+RUN yum install -y \
+        postgresql-jdbc \
+        mysql-connector-java \
+    && yum clean all \
+    && rm -rf /var/cache/yum
+
+COPY --from=build /build/packaging/target/apache-hive-$HIVE_VERSION-bin/apache-hive-$HIVE_VERSION-bin $HIVE_HOME
+
+ENV HADOOP_CLASSPATH $HIVE_HOME/hcatalog/share/hcatalog/*:${HADOOP_CLASSPATH}
+
+# Configure Hadoop AWS Jars to be available to hive
+RUN ln -s ${HADOOP_HOME}/share/hadoop/tools/lib/*aws* $HIVE_HOME/lib
+# Configure MySQL connector jar to be available to hive
+RUN ln -s /usr/share/java/mysql-connector-java.jar "$HIVE_HOME/lib/mysql-connector-java.jar"
+# Configure Postgesql connector jar to be available to hive
+RUN ln -s /usr/share/java/postgresql-jdbc.jar "$HIVE_HOME/lib/postgresql-jdbc.jar"
+
+RUN ln -s $HIVE_HOME /opt/hive
+
+RUN \
+    mkdir -p /var/lib/hive /user/hive/warehouse && \
+    chown -R 1002:0 /opt /var/lib/hive /user/hive/warehouse && \
+    chmod -R 770 /opt /var/lib/hive /user/hive/warehouse /etc/passwd
+
+VOLUME /user/hive/warehouse /var/lib/hive
+
+USER 1002
+
+LABEL io.k8s.display-name="OpenShift Hive" \
+      io.k8s.description="This is an image used by operator-metering to to install and run Apache Hive." \
+      io.openshift.tags="openshift" \
+      maintainer="Chance Zibolski <czibolsk@redhat.com>"
+
+
