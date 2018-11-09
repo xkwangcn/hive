@@ -1,4 +1,4 @@
-FROM centos:7 as build
+FROM rhel7:7-released AS build
 
 RUN yum -y update && yum clean all
 
@@ -26,7 +26,7 @@ RUN mkdir -p $(dirname $HIVE_OUT) && \
     && mv /tmp/apache-hive-${HIVE_VERSION}.redhat-${RH_HIVE_PATCH_VERSION}-bin/ \
     $HIVE_OUT
 
-FROM quay.io/coreos/hadoop:metering-3.1.1
+FROM openshift/ose-hadoop:v4.0
 
 ENV HIVE_VERSION=2.3.3
 ENV HIVE_HOME=/opt/hive-$HIVE_VERSION
