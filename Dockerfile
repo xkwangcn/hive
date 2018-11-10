@@ -46,7 +46,7 @@ RUN ln -s $HIVE_HOME /opt/hive
 RUN \
     mkdir -p /var/lib/hive /user/hive/warehouse && \
     chown -R 1002:0 /opt /var/lib/hive /user/hive/warehouse && \
-    chmod -R 770 /opt /var/lib/hive /user/hive/warehouse /etc/passwd
+    chmod -R 774 /opt /var/lib/hive /user/hive/warehouse /etc/passwd
 
 VOLUME /user/hive/warehouse /var/lib/hive
 
