@@ -2,7 +2,8 @@ FROM fedora:28 as build
 
 RUN yum -y update && yum clean all
 
-RUN yum -y install java-1.8.0-openjdk maven \
+RUN yum -y install --setopt=skip_missing_names_on_install=False \
+        java-1.8.0-openjdk maven \
     && yum clean all \
     && rm -rf /var/cache/yum
 
@@ -24,7 +25,7 @@ WORKDIR /opt
 
 USER root
 
-RUN yum install -y \
+RUN yum install --setopt=skip_missing_names_on_install=False -y \
         postgresql-jdbc \
         mysql-connector-java \
     && yum clean all \
