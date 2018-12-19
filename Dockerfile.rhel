@@ -57,10 +57,11 @@ RUN ln -s /usr/share/java/postgresql-jdbc.jar "$HIVE_HOME/lib/postgresql-jdbc.ja
 
 RUN ln -s $HIVE_HOME /opt/hive
 
-RUN \
-    mkdir -p /var/lib/hive /user/hive/warehouse && \
-    chown -R 1002:0 /opt /var/lib/hive /user/hive/warehouse && \
-    chmod -R 774 /opt /var/lib/hive /user/hive/warehouse /etc/passwd
+# imagebuilder expects the directory to be created before VOLUME
+RUN mkdir -p /var/lib/hive /user/hive/warehouse /.beeline $HOME/.beeline
+# to allow running as non-root
+RUN chown -R 1002:0 /opt /var/lib/hive /user/hive/warehouse /.beeline $HOME/.beeline && \
+    chmod -R 774 /opt /var/lib/hive /user/hive/warehouse /.beeline $HOME/.beeline /etc/passwd
 
 VOLUME /user/hive/warehouse /var/lib/hive
 
