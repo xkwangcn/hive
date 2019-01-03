@@ -44,6 +44,13 @@ RUN ln -s /usr/share/java/postgresql-jdbc.jar "$HIVE_HOME/lib/postgresql-jdbc.ja
 
 RUN ln -s $HIVE_HOME /opt/hive
 
+# https://docs.oracle.com/javase/7/docs/technotes/guides/net/properties.html
+# Java caches dns results forever, don't cache dns results forever:
+RUN sed -i '/networkaddress.cache.ttl/d' $JAVA_HOME/lib/security/java.security
+RUN sed -i '/networkaddress.cache.negative.ttl/d' $JAVA_HOME/lib/security/java.security
+RUN echo 'networkaddress.cache.ttl=0' >> $JAVA_HOME/lib/security/java.security
+RUN echo 'networkaddress.cache.negative.ttl=0' >> $JAVA_HOME/lib/security/java.security
+
 # imagebuilder expects the directory to be created before VOLUME
 RUN mkdir -p /var/lib/hive /user/hive/warehouse /.beeline $HOME/.beeline
 # to allow running as non-root
