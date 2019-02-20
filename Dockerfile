@@ -8,7 +8,47 @@ RUN yum -y install \
     && rm -rf /var/cache/yum
 
 RUN mkdir /build
-COPY . /build
+COPY .git /build/.git
+COPY accumulo-handler /build/accumulo-handler
+COPY beeline /build/beeline
+COPY bin /build/bin
+COPY binary-package-licenses /build/binary-package-licenses
+COPY checkstyle /build/checkstyle
+COPY cli /build/cli
+COPY common /build/common
+COPY conf /build/conf
+COPY contrib /build/contrib
+COPY data /build/data
+COPY dev-support /build/dev-support
+COPY docs /build/docs
+COPY druid-handler /build/druid-handler
+COPY files /build/files
+COPY findbugs /build/findbugs
+COPY hbase-handler /build/hbase-handler
+COPY hcatalog /build/hcatalog
+COPY hive-blobstore /build/hive-blobstore
+COPY hplsql /build/hplsql
+COPY itests /build/itests
+COPY jdbc-handler /build/jdbc-handler
+COPY jdbc /build/jdbc
+COPY lib /build/lib
+COPY llap-client /build/llap-client
+COPY llap-common /build/llap-common
+COPY llap-ext-client /build/llap-ext-client
+COPY llap-server /build/llap-server
+COPY llap-tez /build/llap-tez
+COPY metastore /build/metastore
+COPY packaging /build/packaging
+COPY ql /build/ql
+COPY serde /build/serde
+COPY service-rpc /build/service-rpc
+COPY service /build/service
+COPY shims /build/shims
+COPY spark-client /build/spark-client
+COPY storage-api /build/storage-api
+COPY testutils /build/testutils
+COPY vector-code-gen /build/vector-code-gen
+COPY pom.xml /build/pom.xml
 
 WORKDIR /build
 
@@ -34,6 +74,7 @@ RUN yum install --setopt=skip_missing_names_on_install=False -y \
 COPY --from=build /build/packaging/target/apache-hive-$HIVE_VERSION-bin/apache-hive-$HIVE_VERSION-bin $HIVE_HOME
 
 ENV HADOOP_CLASSPATH $HIVE_HOME/hcatalog/share/hcatalog/*:${HADOOP_CLASSPATH}
+ENV JAVA_HOME=/etc/alternatives/jre
 
 # Configure Hadoop AWS Jars to be available to hive
 RUN ln -s ${HADOOP_HOME}/share/hadoop/tools/lib/*aws* $HIVE_HOME/lib
