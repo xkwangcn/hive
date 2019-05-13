@@ -52,7 +52,7 @@ COPY pom.xml /build/pom.xml
 
 WORKDIR /build
 
-RUN mvn -B -e -T 1C -DskipTests=true -DfailIfNoTests=false -Dtest=false clean package -Pdist
+RUN mvn -B -e -DskipTests=true -DfailIfNoTests=false -Dtest=false clean package -Pdist
 
 FROM quay.io/coreos/hadoop:latest
 
