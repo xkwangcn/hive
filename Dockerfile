@@ -54,7 +54,7 @@ WORKDIR /build
 
 RUN mvn -B -e -T 1C -DskipTests=true -DfailIfNoTests=false -Dtest=false clean package -Pdist
 
-FROM quay.io/coreos/hadoop:metering-3.1.1
+FROM quay.io/coreos/hadoop:latest
 
 ENV HIVE_VERSION=2.3.3
 ENV HIVE_HOME=/opt/hive-$HIVE_VERSION
