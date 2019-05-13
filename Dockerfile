@@ -3,7 +3,7 @@ FROM fedora:28 as build
 RUN yum -y update && yum clean all
 
 RUN yum -y install \
-        java-1.8.0-openjdk maven \
+        java-11-openjdk maven \
     && yum clean all \
     && rm -rf /var/cache/yum
 
