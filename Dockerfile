@@ -51,10 +51,11 @@ COPY vector-code-gen /build/vector-code-gen
 COPY pom.xml /build/pom.xml
 
 WORKDIR /build
+ENV JAVA_HOME=/etc/alternatives/jre
 
-RUN mvn -B -e -DskipTests=true -DfailIfNoTests=false -Dtest=false clean package -Pdist
+RUN mvn --quiet -B -e -DskipTests=true -DfailIfNoTests=false -Dtest=false clean package -Pdist
 
-FROM quay.io/coreos/hadoop:latest
+FROM quay.io/coreos/hadoop:metering-3.3.0-trunk-java-11
 
 ENV HIVE_VERSION=2.3.3
 ENV HIVE_HOME=/opt/hive-$HIVE_VERSION
