@@ -63,12 +63,12 @@ RUN echo 'networkaddress.cache.ttl=0' >> $JAVA_HOME/lib/security/java.security
 RUN echo 'networkaddress.cache.negative.ttl=0' >> $JAVA_HOME/lib/security/java.security
 
 # imagebuilder expects the directory to be created before VOLUME
-RUN mkdir -p /var/lib/hive /user/hive/warehouse /.beeline $HOME/.beeline
+RUN mkdir -p /var/lib/hive /.beeline $HOME/.beeline
 # to allow running as non-root
-RUN chown -R 1002:0 $HIVE_HOME $HADOOP_HOME /var/lib/hive /user/hive/warehouse /.beeline $HOME/.beeline && \
-    chmod -R 774 $HIVE_HOME $HADOOP_HOME /var/lib/hive /user/hive/warehouse /.beeline $HOME/.beeline /etc/passwd
+RUN chown -R 1002:0 $HIVE_HOME $HADOOP_HOME /var/lib/hive /.beeline $HOME/.beeline && \
+    chmod -R 774 $HIVE_HOME $HADOOP_HOME /var/lib/hive /.beeline $HOME/.beeline /etc/passwd
 
-VOLUME /user/hive/warehouse /var/lib/hive
+VOLUME /var/lib/hive
 
 USER 1002
 
