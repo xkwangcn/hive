@@ -30,7 +30,7 @@ RUN mkdir -p $(dirname $HIVE_OUT) && \
 FROM openshift/ose-metering-hadoop:latest
 
 ENV HIVE_VERSION=2.3.3
-ENV HIVE_HOME=/opt/hive-$HIVE_VERSION
+ENV HIVE_HOME=/opt/hive
 ENV PATH=$HIVE_HOME/bin:$PATH
 
 RUN mkdir -p /opt
@@ -55,8 +55,6 @@ RUN ln -s /usr/share/java/mysql-connector-java.jar "$HIVE_HOME/lib/mysql-connect
 # Configure Postgesql connector jar to be available to hive
 RUN ln -s /usr/share/java/postgresql-jdbc.jar "$HIVE_HOME/lib/postgresql-jdbc.jar"
 
-RUN ln -s $HIVE_HOME /opt/hive
-
 # https://docs.oracle.com/javase/7/docs/technotes/guides/net/properties.html
 # Java caches dns results forever, don't cache dns results forever:
 RUN sed -i '/networkaddress.cache.ttl/d' $JAVA_HOME/lib/security/java.security
@@ -65,12 +63,12 @@ RUN echo 'networkaddress.cache.ttl=0' >> $JAVA_HOME/lib/security/java.security
 RUN echo 'networkaddress.cache.negative.ttl=0' >> $JAVA_HOME/lib/security/java.security
 
 # imagebuilder expects the directory to be created before VOLUME
-RUN mkdir -p /var/lib/hive /user/hive/warehouse /.beeline $HOME/.beeline
+RUN mkdir -p /var/lib/hive /.beeline $HOME/.beeline
 # to allow running as non-root
-RUN chown -R 1002:0 /opt /var/lib/hive /user/hive/warehouse /.beeline $HOME/.beeline && \
-    chmod -R 774 /opt /var/lib/hive /user/hive/warehouse /.beeline $HOME/.beeline /etc/passwd
+RUN chown -R 1002:0 $HIVE_HOME $HADOOP_HOME /var/lib/hive /.beeline $HOME/.beeline && \
+    chmod -R 774 $HIVE_HOME $HADOOP_HOME /var/lib/hive /.beeline $HOME/.beeline /etc/passwd
 
-VOLUME /user/hive/warehouse /var/lib/hive
+VOLUME /var/lib/hive
 
 USER 1002
 
