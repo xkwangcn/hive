@@ -72,6 +72,7 @@ RUN yum install --setopt=skip_missing_names_on_install=False -y \
     && rm -rf /var/cache/yum
 
 COPY --from=build /build/packaging/target/apache-hive-$HIVE_VERSION-bin/apache-hive-$HIVE_VERSION-bin $HIVE_HOME
+WORKDIR $HIVE_HOME
 
 ENV HADOOP_CLASSPATH $HIVE_HOME/hcatalog/share/hcatalog/*:${HADOOP_CLASSPATH}
 ENV JAVA_HOME=/etc/alternatives/jre
