@@ -67,6 +67,7 @@ USER root
 
 RUN yum install --setopt=skip_missing_names_on_install=False -y \
         postgresql-jdbc \
+        openssl \
         mysql-connector-java \
     && yum clean all \
     && rm -rf /var/cache/yum
