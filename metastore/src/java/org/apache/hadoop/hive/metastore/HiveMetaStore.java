@@ -6938,11 +6938,13 @@ public class HiveMetaStore extends ThriftHiveMetastore {
    *
    */
   static public class HiveMetastoreCli extends CommonCliOptions {
+    private String bindHost;
     private int port;
 
     @SuppressWarnings("static-access")
     public HiveMetastoreCli(Configuration configuration) {
       super("hivemetastore", true);
+      this.bindHost = HiveConf.getVar(configuration, HiveConf.ConfVars.METASTORE_BIND_HOST);
       this.port = HiveConf.getIntVar(configuration, HiveConf.ConfVars.METASTORE_SERVER_PORT);
 
       // -p port
@@ -6984,6 +6986,9 @@ public class HiveMetaStore extends ThriftHiveMetastore {
       }
     }
 
+    public String getBindHost() {
+      return this.bindHost;
+    }
     public int getPort() {
       return this.port;
     }
@@ -7017,7 +7022,7 @@ public class HiveMetaStore extends ThriftHiveMetastore {
     HiveStringUtils.startupShutdownMessage(HiveMetaStore.class, args, LOG);
 
     try {
-      String msg = "Starting hive metastore on port " + cli.port;
+      String msg = "Starting hive metastore on " + cli.bindHost + ":" + cli.port;
       HMSHandler.LOG.info(msg);
       if (cli.isVerbose()) {
         System.err.println(msg);
@@ -7064,7 +7069,7 @@ public class HiveMetaStore extends ThriftHiveMetastore {
       Condition startCondition = startLock.newCondition();
       AtomicBoolean startedServing = new AtomicBoolean();
       startMetaStoreThreads(conf, startLock, startCondition, startedServing);
-      startMetaStore(cli.getPort(), ShimLoader.getHadoopThriftAuthBridge(), conf, startLock,
+      startMetaStore(cli.getBindHost(), cli.getPort(), ShimLoader.getHadoopThriftAuthBridge(), conf, startLock,
           startCondition, startedServing);
     } catch (Throwable t) {
       // Catch the exception, log it and rethrow it.
@@ -7077,37 +7082,40 @@ public class HiveMetaStore extends ThriftHiveMetastore {
   /**
    * Start Metastore based on a passed {@link HadoopThriftAuthBridge}
    *
+   * @param bindHost
    * @param port
    * @param bridge
    * @throws Throwable
    */
-  public static void startMetaStore(int port, HadoopThriftAuthBridge bridge)
+  public static void startMetaStore(String bindHost, int port, HadoopThriftAuthBridge bridge)
       throws Throwable {
-    startMetaStore(port, bridge, new HiveConf(HMSHandler.class), null, null, null);
+    startMetaStore(bindHost, port, bridge, new HiveConf(HMSHandler.class), null, null, null);
   }
 
   /**
    * Start the metastore store.
+   * @param bindHost
    * @param port
    * @param bridge
    * @param conf
    * @throws Throwable
    */
-  public static void startMetaStore(int port, HadoopThriftAuthBridge bridge,
+  public static void startMetaStore(String bindHost, int port, HadoopThriftAuthBridge bridge,
                                     HiveConf conf) throws Throwable {
-    startMetaStore(port, bridge, conf, null, null, null);
+    startMetaStore(bindHost, port, bridge, conf, null, null, null);
   }
 
   /**
    * Start Metastore based on a passed {@link HadoopThriftAuthBridge}
    *
+   * @param bindHost
    * @param port
    * @param bridge
    * @param conf
    *          configuration overrides
    * @throws Throwable
    */
-  public static void startMetaStore(int port, HadoopThriftAuthBridge bridge,
+  public static void startMetaStore(String bindHost, int port, HadoopThriftAuthBridge bridge,
       HiveConf conf, Lock startLock, Condition startCondition,
       AtomicBoolean startedServing) throws Throwable {
     try {
@@ -7157,7 +7165,7 @@ public class HiveMetaStore extends ThriftHiveMetastore {
                 MetaStoreUtils.getMetaStoreSaslProperties(conf));
         processor = saslServer.wrapProcessor(
           new ThriftHiveMetastore.Processor<IHMSHandler>(handler));
-        serverSocket = HiveAuthUtils.getServerSocket(null, port);
+        serverSocket = HiveAuthUtils.getServerSocket(bindHost, port);
 
         LOG.info("Starting DB backed MetaStore Server in Secure Mode");
       } else {
@@ -7183,7 +7191,7 @@ public class HiveMetaStore extends ThriftHiveMetastore {
           sslVersionBlacklist.add(sslVersion);
         }
         if (!useSSL) {
-          serverSocket = HiveAuthUtils.getServerSocket(null, port);
+          serverSocket = HiveAuthUtils.getServerSocket(bindHost, port);
         } else {
           String keyStorePath = conf.getVar(ConfVars.HIVE_METASTORE_SSL_KEYSTORE_PATH).trim();
           if (keyStorePath.isEmpty()) {

@@ -1186,7 +1186,7 @@ public class MetaStoreUtils {
     }
     return String.valueOf(SerDeUtils.COMMA);
   }
-  
+
   /**
    * Convert FieldSchemas to columnNames.
    */
@@ -1269,7 +1269,7 @@ public class MetaStoreUtils {
       @Override
       public void run() {
         try {
-          HiveMetaStore.startMetaStore(port, bridge, finalHiveConf);
+          HiveMetaStore.startMetaStore(null, port, bridge, finalHiveConf);
         } catch (Throwable e) {
           LOG.error("Metastore Thrift Server threw an exception...",e);
         }
