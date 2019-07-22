@@ -158,8 +158,9 @@ public class ThriftBinaryCLIService extends ThriftCLIService {
           currentServerContext.set(serverContext);
         }
       });
-      String msg = "Starting " + ThriftBinaryCLIService.class.getSimpleName() + " on port "
-          + portNum + " with " + minWorkerThreads + "..." + maxWorkerThreads + " worker threads";
+      String msg = "Starting " + ThriftBinaryCLIService.class.getSimpleName()
+          + " on " + hiveHost + ":" + portNum
+          + " with " + minWorkerThreads + "..." + maxWorkerThreads + " worker threads";
       LOG.info(msg);
       server.serve();
     } catch (Throwable t) {
