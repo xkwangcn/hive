@@ -65,7 +65,8 @@ WORKDIR /opt
 
 USER root
 
-RUN yum install --setopt=skip_missing_names_on_install=False -y \
+RUN yum -y update && \
+    yum install --setopt=skip_missing_names_on_install=False -y \
         postgresql-jdbc \
         openssl \
         mysql-connector-java \
