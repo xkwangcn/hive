@@ -12,7 +12,7 @@ COPY . /build
 
 WORKDIR /build
 
-ENV RH_HIVE_PATCH_VERSION 00001
+ENV RH_HIVE_PATCH_VERSION 00002
 ENV HIVE_VERSION 2.3.3
 
 ENV HIVE_RELEASE_URL http://download.eng.bos.redhat.com/brewroot/packages/org.apache.hive-hive/${HIVE_VERSION}.redhat_${RH_HIVE_PATCH_VERSION}/1/maven/org/apache/hive/hive-packaging/${HIVE_VERSION}.redhat-${RH_HIVE_PATCH_VERSION}/hive-packaging-${HIVE_VERSION}.redhat-${RH_HIVE_PATCH_VERSION}-bin.tar.gz
