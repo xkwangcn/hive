@@ -1,6 +1,9 @@
 approvers:
-- chancez
+- timflannagan1
+- bparees
+- bentito
 reviewers:
 - timflannagan1
 - EmilyM1
 - bentito
+component: "Metering Operator"
